@@ -90,7 +90,8 @@ internal class Program
         graph.transverseGraphDFS(n0);
 
         //Short algorithm
-        graph.shortAlgorithm(n0, n12);
         graph.shortAlgorithmDefinitive(n0, n12);
+
+        graph.longAlgorithmDefinitive2(n0, n12);
     }
 }

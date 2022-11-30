@@ -12,17 +12,21 @@ namespace practicaGrafo
         //Attributes
 
         public List<Node> nodesList = new List<Node>();
-        private List<Edge> edgesList = new List<Edge>();
+        public List<Edge> edgesList = new List<Edge>();
 
-        public int assignNodeData = 0;
+        public int assignNodeData = 1;
 
         public int shortest = 0;
+
         public List<Node> nodeShortPath = new List<Node>();
 
         public List<Edge> shortestPathC = new List<Edge>();
         public bool firstTime = true;
+        public bool firstTime1 = true;
 
         public int[] shortestPath = new int[10];
+
+        public int[] longestPath = new int[10];
 
         //Methods
         public void insertNode(Node node)
@@ -222,6 +226,25 @@ namespace practicaGrafo
 
             }
         }
+        public int[] transverseGraphBFS2(Node node)
+        {
+            int[] values = new int[nodesList.Count];
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = 0;
+            }
+
+            values[0] = node.data;
+
+            foreach (Node nodes in node.children)
+            {
+                transverseGraphBFS(nodes, values);
+            }
+            Console.Write("\n" + "Transverse BFS method: (");
+            return values;
+
+        }
         public void transverseGraphBFS(Node node, int[] values)
         {
             if (!values.Contains(node.data))
@@ -262,6 +285,46 @@ namespace practicaGrafo
                 }
             }
 
+            Console.Write("\n" + "Transverse DFS method: (");
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values.Length - 1 == i)
+                {
+                    Console.Write(values[i] + ")");
+                }
+                else
+                {
+                    Console.Write(values[i] + ", ");
+                }
+
+            }
+        }
+        public int[] transverseGraphDFS2(Node node)
+        {
+            int[] values = new int[nodesList.Count];
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = 0;
+            }
+
+            foreach (Node nodes in node.children)
+            {
+                transverseGraphDFS(nodes, values);
+            }
+
+            if (!values.Contains(node.data))
+            {
+                for (int i = 0; i < values.Length; i++)
+                {
+                    if (values[i] == 0)
+                    {
+                        values[i] = node.data;
+                        break;
+                    }
+                }
+            }
+            return values;
             Console.Write("\n" + "Transverse DFS method: (");
             for (int i = 0; i < values.Length; i++)
             {
@@ -345,7 +408,14 @@ namespace practicaGrafo
             {
                 return;
             }
-            
+            ///
+            //if (edgeIn.finalNode.children == null)
+            //{
+            //	//Una nueva función debe comparar ahora los nodes iniciales en vez de los finales.
+            //	shortAlgorithmInitial(edgeIn, goal,maxNumb);
+            //	return;
+            //}
+            ///
             foreach (Edge edges in edgesList)
             {
                 if (edges.initialNode == edgeIn.finalNode)
@@ -398,7 +468,35 @@ namespace practicaGrafo
                 {
                     Console.Write(shortestPath[i] + ", ");
                 }
+
             }
+
+        }
+        public int[] shortAlgorithmDefinitive2(Node initialNode, Node goal)
+        {
+            List<Edge> pathOfEdges = new List<Edge>();
+
+
+
+            foreach (Edge edges in edgesList)
+            {
+                if (edges.initialNode == initialNode)
+                {
+                    pathOfEdges.Add(edges);
+
+                    foreach (Node nodeChildren in initialNode.children)
+                    {
+                        if (nodeChildren == edges.finalNode)
+                        {
+                            shortAlgorithmDefinitive(nodeChildren, goal, pathOfEdges);
+                        }
+                    }
+                    pathOfEdges.Remove(edges);
+
+                }
+            }
+            firstTime = true;
+            return shortestPath;
 
         }
         public void shortAlgorithmDefinitive(Node nodeChildren, Node goal, List<Edge> pathOfEdges)
@@ -465,6 +563,103 @@ namespace practicaGrafo
                 }
             }
         }
+        public void longAlgorithmDefinitive2(Node initialNode, Node goal)
+        {
+            List<Edge> pathOfEdges2 = new List<Edge>();
+
+            foreach (Edge edges in edgesList)
+            {
+                if (edges.initialNode == initialNode)
+                {
+                    pathOfEdges2.Add(edges);
+
+                    foreach (Node nodeChildren in initialNode.children)
+                    {
+                        if (nodeChildren == edges.finalNode)
+                        {
+                            longAlgorithmDefinitive(nodeChildren, goal, pathOfEdges2);
+                        }
+                    }
+                    pathOfEdges2.Remove(edges);
+
+                }
+            }
+            firstTime1 = true;
+            Console.Write("\n" + "longestPath: ");
+            for (int i = 0; i < longestPath.Length; i++)
+            {
+                if (longestPath[i] != 0)
+                {
+                    Console.Write(longestPath[i] + " ");
+                }
+            }
+
+        }
+        public void longAlgorithmDefinitive(Node nodeChildren, Node goal, List<Edge> pathOfEdges)
+        {
+            if (nodeChildren == goal)
+            {
+                if (firstTime1 == true)
+                {
+                    foreach (Edge edge in pathOfEdges)
+                    {
+                        for (int i = 0; i < longestPath.Length; i++)
+                        {
+                            if (longestPath[i] == 0)
+                            {
+                                longestPath[i] = edge.weight;
+                                break;
+                            }
+                        }
+                    }
+                    //shortestPath = pathOfEdges;
+                    firstTime1 = false;
+                }
+                else if (pathSum(longestPath) < pathSum(pathOfEdges))
+                {
+                    for (int j = 0; j < longestPath.Length; j++)
+                    {
+                        if (longestPath[j] != 0)
+                        {
+                            longestPath[j] = 0;
+                        }
+
+                    }
+                    foreach (Edge edge in pathOfEdges)
+                    {
+                        for (int i = 0; i < longestPath.Length; i++)
+                        {
+                            if (longestPath[i] == 0)
+                            {
+                                longestPath[i] = edge.weight;
+                                break;
+                            }
+                        }
+                    }
+                    //shortestPath = pathOfEdges;
+                }
+                return;
+            }
+
+            foreach (Edge edges in edgesList)
+            {
+                if (edges.initialNode == nodeChildren)
+                {
+                    pathOfEdges.Add(edges);
+
+                    foreach (Node nodeChildrens in nodeChildren.children)
+                    {
+                        if (nodeChildrens == edges.finalNode)
+                        {
+                            longAlgorithmDefinitive(nodeChildrens, goal, pathOfEdges);
+                        }
+                    }
+                    pathOfEdges.Remove(edges);
+
+                }
+            }
+        }
+
         public int pathSum(List<Edge> path)
         {
             int pathResult = 0;
